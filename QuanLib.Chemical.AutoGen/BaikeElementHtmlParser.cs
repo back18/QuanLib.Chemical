@@ -27,7 +27,7 @@ namespace QuanLib.Chemical.AutoGen
             {
                 Name = GetName(),
                 Description = GetDescription(),
-                Propertys = GetPropertys().AsReadOnly()
+                Properties = GetProperties().AsReadOnly()
             };
         }
 
@@ -43,7 +43,7 @@ namespace QuanLib.Chemical.AutoGen
             return ReferencesRegex().Replace(divNode.InnerText, string.Empty);
         }
 
-        public Dictionary<string, string> GetPropertys()
+        public Dictionary<string, string> GetProperties()
         {
             Dictionary<string, string> result = [];
             HtmlNodeCollection divNodes = _htmlDocument.DocumentNode.SelectNodes("//div[contains(@class, 'itemWrapper')]");

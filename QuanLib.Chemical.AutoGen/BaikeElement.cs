@@ -13,7 +13,7 @@ namespace QuanLib.Chemical.AutoGen
 
         public required string Description { get; set; }
 
-        public required ReadOnlyDictionary<string, string> Propertys { get; set; }
+        public required ReadOnlyDictionary<string, string> Properties { get; set; }
 
         public override string ToString()
         {
