@@ -18,6 +18,8 @@ namespace QuanLib.Chemical.AutoGen
 
         public static readonly string DownloadsDirectory = Path.Combine(ResourcesDirectory, "downloads");
 
+        public static readonly string OutDirectory = Path.Combine(ResourcesDirectory, "out");
+
         public static readonly string PubchemPeriodicTableCsv = Path.Combine(DownloadsDirectory, "PubchemPeriodicTable.csv");
 
         public static readonly string BaikePeriodicTableHtml = Path.Combine(DownloadsDirectory, "BaikePeriodicTable.html");

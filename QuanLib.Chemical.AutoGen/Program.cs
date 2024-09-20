@@ -1,4 +1,6 @@
 ﻿using HtmlAgilityPack;
+using QuanLib.Chemical.Extensions;
+using QuanLib.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,42 +16,42 @@ namespace QuanLib.Chemical.AutoGen
             FileHelper.DownloadAllFileAsync().Wait();
             Dictionary<string, ElementContext> elementContexts = GetElementContexts();
 
-            File.WriteAllText(Path.Combine(FileHelper.ResourcesDirectory, "ElementSymbol.cs"), BuildElementSymbolEnum(elementContexts));
+            Release(DataBuilder.BuildElementSymbolEnum(elementContexts), "ElementSymbol.cs", FileHelper.OutDirectory, "..\\..\\..\\..\\QuanLib.Chemical");
+            Release(DataBuilder.BuildPeriodicTableCsv(elementContexts), "PeriodicTable.csv", FileHelper.OutDirectory, "..\\..\\..\\..\\QuanLib.Chemical\\Data");
+
+            Console.ReadLine();
+
+            Element[] elements = PeriodicTable.GetElements();
+            foreach (Element element in elements)
+            {
+                Console.Clear();
+                Console.WriteLine(element.GetPropertiesInfo());
+                Console.ReadLine();
+            }
         }
 
-        public static string BuildElementSymbolEnum(Dictionary<string, ElementContext> elementContexts)
+        public static void Release(string content, string fileName, string outPath, string targetPath)
         {
-            ArgumentNullException.ThrowIfNull(elementContexts, nameof(elementContexts));
+            ArgumentException.ThrowIfNullOrEmpty(content, nameof(content));
+            ArgumentException.ThrowIfNullOrEmpty(fileName, nameof(fileName));
+            ArgumentException.ThrowIfNullOrEmpty(outPath, nameof(outPath));
+            ArgumentException.ThrowIfNullOrEmpty(targetPath, nameof(targetPath));
 
-            StringBuilder stringBuilder = new();
+            string outFile = Path.Combine(outPath, fileName);
+            string targetFile = Path.Combine(targetPath, fileName);
+            string outContent = File.Exists(outFile) ? File.ReadAllText(outFile, Encoding.UTF8) : string.Empty;
+            string targetContent = File.Exists(targetFile) ? File.ReadAllText(targetFile, Encoding.UTF8) : string.Empty;
 
-            stringBuilder.AppendLine("using System;");
-            stringBuilder.AppendLine("using System.Collections.Generic;");
-            stringBuilder.AppendLine("using System.Linq;");
-            stringBuilder.AppendLine("using System.Text;");
-            stringBuilder.AppendLine("using System.Threading.Tasks;");
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine("namespace QuanLib.Chemical");
-            stringBuilder.AppendLine("{");
-            stringBuilder.AppendLine("    public enum ElementSymbol");
-            stringBuilder.AppendLine("    {");
+            Console.WriteLine("已构建文件：" + fileName);
+            Console.WriteLine("是否与上一次输出的文件一致：" + StringComparer.Ordinal.Equals(content, outContent));
+            Console.WriteLine("是否与目标文件一致：" + StringComparer.Ordinal.Equals(content, targetContent));
 
-            List<string> fields = [];
-            foreach (ElementContext elementContext in elementContexts.Values)
-            {
-                stringBuilder.AppendLine("        /// <summary>");
-                stringBuilder.AppendFormat("        /// {0} ({1})", elementContext.BaikeElementIntroduction.ChineseName, elementContext.PubchemElement.Name);
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine("        /// </summary>");
-                stringBuilder.AppendFormat("        {0} = {1},", elementContext.PubchemElement.Symbol, elementContext.PubchemElement.AtomicNumber);
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine();
-            }
+            if (!Directory.Exists(outPath))
+                Directory.CreateDirectory(outPath);
+            File.WriteAllText(outFile, content, Encoding.UTF8);
 
-            stringBuilder.AppendLine("    }");
-            stringBuilder.AppendLine("}");
-
-            return stringBuilder.ToString();
+            Console.WriteLine("文件已保存到" + outFile);
+            Console.WriteLine();
         }
 
         public static Dictionary<string, ElementContext> GetElementContexts()
