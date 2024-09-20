@@ -69,7 +69,7 @@ namespace QuanLib.Chemical.AutoGen
 
         public static Dictionary<string, PubchemPeriodicTableItem> GetPubchemPeriodicTableItems()
         {
-            return new PubchemPeriodicTableCsvParser(FileHelper.ReadPubchemPeriodicTableCsv()).GetElements();
+            return new PubchemPeriodicTableCsvParser(FileHelper.ReadPubchemPeriodicTableCsv()).GetPeriodicTableItems();
         }
 
         public static Dictionary<string, BaikePeriodicTableItem> GetBaikePeriodicTableItems()
