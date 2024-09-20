@@ -18,13 +18,19 @@ namespace QuanLib.Chemical.AutoGen
 
         public static readonly string DownloadsDirectory = Path.Combine(ResourcesDirectory, "downloads");
 
+        public static readonly string BaikeElementDirectory = Path.Combine(DownloadsDirectory, "baike");
+
+        public static readonly string BaikeElementHtmlFormat = Path.Combine(BaikeElementDirectory, "{0}.html");
+
+        public static readonly string PubchemElementDirectory = Path.Combine(DownloadsDirectory, "pubchem");
+
+        public static readonly string PubchemElementJsonFormat = Path.Combine(PubchemElementDirectory, "{0}.json");
+
         public static readonly string OutDirectory = Path.Combine(ResourcesDirectory, "out");
 
         public static readonly string PubchemPeriodicTableCsv = Path.Combine(DownloadsDirectory, "PubchemPeriodicTable.csv");
 
         public static readonly string BaikePeriodicTableHtml = Path.Combine(DownloadsDirectory, "BaikePeriodicTable.html");
-
-        public static readonly string BaikeElementHtmlFormat = Path.Combine(DownloadsDirectory, "{0}.html");
 
         public static async Task DownloadAllFileAsync()
         {
@@ -42,6 +48,21 @@ namespace QuanLib.Chemical.AutoGen
             else
                 baikePeriodicTableHtml = await ReadBaikePeriodicTableHtmlAsync();
 
+            PubchemPeriodicTableCsvParser pubchemPeriodicTableCsvParser = new(pubchemPeriodicTableCsv);
+            Dictionary<string, PubchemPeriodicTableItem> pubchemPeriodicTableItems = pubchemPeriodicTableCsvParser.GetPeriodicTableItems();
+            Dictionary<string, string> pubchemElementUrls = pubchemPeriodicTableCsvParser.GetElementUrls();
+            
+            foreach (PubchemPeriodicTableItem periodicTableItem in pubchemPeriodicTableItems.Values)
+            {
+                string url = pubchemElementUrls[periodicTableItem.AtomicNumber];
+                string path = string.Format(PubchemElementJsonFormat, periodicTableItem.Symbol);
+
+                if (File.Exists(path))
+                    continue;
+
+                string json = await DownloadTextAsync(url, path);
+            }
+
             BaikePeriodicTableHtmlParser baikePeriodicTableHtmlParser = new(baikePeriodicTableHtml);
             Dictionary<string, BaikePeriodicTableItem> baikePeriodicTableItems = baikePeriodicTableHtmlParser.GetPeriodicTableItems();
             Dictionary<string, string> baikeElementUrls = baikePeriodicTableHtmlParser.GetElementUrls();
@@ -51,31 +72,31 @@ namespace QuanLib.Chemical.AutoGen
                 string url = baikeElementUrls[periodicTableItem.ChineseName];
                 string path = string.Format(BaikeElementHtmlFormat, periodicTableItem.Symbol);
 
-                if (!File.Exists(path))
+                if (File.Exists(path))
+                    continue;
+
+                while (true)
                 {
-                    while (true)
+                    string html = await DownloadTextAsync(url, path);
+                    HtmlDocument htmlDocument = new();
+                    htmlDocument.LoadHtml(html);
+
+                    if (htmlDocument.DocumentNode.SelectSingleNode("//title").InnerText.Contains("百度百科-验证"))
                     {
-                        string html = await DownloadTextAsync(url, path);
-                        HtmlDocument htmlDocument = new();
-                        htmlDocument.LoadHtml(html);
-
-                        if (htmlDocument.DocumentNode.SelectSingleNode("//title").InnerText.Contains("百度百科-验证"))
+                        File.Delete(path);
+                        Console.WriteLine("网页需要验证！前往浏览器验证完成后，键入回车继续下载");
+                        Process.Start(new ProcessStartInfo
                         {
-                            File.Delete(path);
-                            Console.WriteLine("网页需要验证！前往浏览器验证完成后，键入回车继续下载");
-                            Process.Start(new ProcessStartInfo
-                            {
-                                FileName = url,
-                                UseShellExecute = true
-                            });
+                            FileName = url,
+                            UseShellExecute = true
+                        });
 
-                            while (Console.ReadKey(true).Key != ConsoleKey.Enter) ;
-                            continue;
-                        }
-
-                        Thread.Sleep(1000);
-                        break;
+                        while (Console.ReadKey(true).Key != ConsoleKey.Enter) ;
+                        continue;
                     }
+
+                    Thread.Sleep(1000);
+                    break;
                 }
             }
         }
@@ -130,6 +151,38 @@ namespace QuanLib.Chemical.AutoGen
             return await File.ReadAllTextAsync(PubchemPeriodicTableCsv, Encoding.UTF8);
         }
 
+        public static string ReadPubchemElementJson(string symbol)
+        {
+            return File.ReadAllText(string.Format(PubchemElementJsonFormat, symbol), Encoding.UTF8);
+        }
+
+        public static async Task<string> ReadPubchemElementJsonAsync(string symbol)
+        {
+            return await File.ReadAllTextAsync(string.Format(PubchemElementJsonFormat, symbol), Encoding.UTF8);
+        }
+
+        public static Dictionary<string, string> ReadAllPubchemElementJson(string[] symbols)
+        {
+            ArgumentNullException.ThrowIfNull(symbols, nameof(symbols));
+
+            Dictionary<string, string> result = [];
+            foreach (string symbol in symbols)
+                result.Add(symbol, ReadPubchemElementJson(symbol));
+
+            return result;
+        }
+
+        public static async Task<Dictionary<string, string>> ReadAllPubchemElementJsonAsync(string[] symbols)
+        {
+            ArgumentNullException.ThrowIfNull(symbols, nameof(symbols));
+
+            Dictionary<string, string> result = new Dictionary<string, string>();
+            foreach (string symbol in symbols)
+                result.Add(symbol, await ReadPubchemElementJsonAsync(symbol));
+
+            return result;
+        }
+
         public static string ReadBaikePeriodicTableHtml()
         {
             return File.ReadAllText(BaikePeriodicTableHtml, Encoding.UTF8);
@@ -140,14 +193,14 @@ namespace QuanLib.Chemical.AutoGen
             return await File.ReadAllTextAsync(BaikePeriodicTableHtml, Encoding.UTF8);
         }
 
-        public static string ReadBaikeElementHtml(string symbols)
+        public static string ReadBaikeElementHtml(string symbol)
         {
-            return File.ReadAllText(string.Format(BaikeElementHtmlFormat, symbols), Encoding.UTF8);
+            return File.ReadAllText(string.Format(BaikeElementHtmlFormat, symbol), Encoding.UTF8);
         }
 
-        public static async Task<string> ReadBaikeElementHtmlAsync(string symbols)
+        public static async Task<string> ReadBaikeElementHtmlAsync(string symbol)
         {
-            return await File.ReadAllTextAsync(string.Format(BaikeElementHtmlFormat, symbols), Encoding.UTF8);
+            return await File.ReadAllTextAsync(string.Format(BaikeElementHtmlFormat, symbol), Encoding.UTF8);
         }
 
         public static Dictionary<string, string> ReadAllBaikeElementHtml(string[] symbols)
@@ -179,6 +232,12 @@ namespace QuanLib.Chemical.AutoGen
 
             if (!Directory.Exists(DownloadsDirectory))
                 Directory.CreateDirectory(DownloadsDirectory);
+
+            if (!Directory.Exists(BaikeElementDirectory))
+                Directory.CreateDirectory(BaikeElementDirectory);
+
+            if (!Directory.Exists(PubchemElementDirectory))
+                Directory.CreateDirectory(PubchemElementDirectory);
         }
     }
 }

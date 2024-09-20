@@ -18,6 +18,7 @@ namespace QuanLib.Chemical.AutoGen
 
             Release(DataBuilder.BuildElementSymbolEnum(elementContexts), "ElementSymbol.cs", FileHelper.OutDirectory, "..\\..\\..\\..\\QuanLib.Chemical");
             Release(DataBuilder.BuildPeriodicTableCsv(elementContexts), "PeriodicTable.csv", FileHelper.OutDirectory, "..\\..\\..\\..\\QuanLib.Chemical\\Data");
+            Release(DataBuilder.BuildIsotopeTableJson(elementContexts), "IsotopeTable.json", FileHelper.OutDirectory, "..\\..\\..\\..\\QuanLib.Chemical\\Data");
 
             Console.ReadLine();
 
@@ -26,6 +27,12 @@ namespace QuanLib.Chemical.AutoGen
             {
                 Console.Clear();
                 Console.WriteLine(element.GetPropertiesInfo());
+
+                Console.WriteLine("StableIsotop: " + element.GetStableIsotope());
+                Isotope[] isotopes = PeriodicTable.GetIsotopes(element.Symbol);
+                foreach (Isotope isotope in isotopes)
+                    Console.WriteLine(isotope);
+
                 Console.ReadLine();
             }
         }
@@ -58,11 +65,12 @@ namespace QuanLib.Chemical.AutoGen
         {
             Dictionary<string, ElementContext> result = [];
             Dictionary<string, PubchemPeriodicTableItem> pubchemPeriodicTableItems = GetPubchemPeriodicTableItems();
+            Dictionary<string, PubchemElementInfo> pubchemElementInfos = GetPubchemElementInfos(pubchemPeriodicTableItems.Keys.ToArray());
             Dictionary<string, BaikePeriodicTableItem> baikePeriodicTableItems = GetBaikePeriodicTableItems();
             Dictionary<string, BaikeElementInfo> baikeElementInfos = GetBaikeElementInfos(pubchemPeriodicTableItems.Keys.ToArray());
 
-            foreach (string symbols in pubchemPeriodicTableItems.Keys)
-                result.Add(symbols, new(pubchemPeriodicTableItems[symbols], baikePeriodicTableItems[symbols], baikeElementInfos[symbols]));
+            foreach (string symbol in pubchemPeriodicTableItems.Keys)
+                result.Add(symbol, new(pubchemPeriodicTableItems[symbol], pubchemElementInfos[symbol], baikePeriodicTableItems[symbol], baikeElementInfos[symbol]));
 
             return result;
         }
@@ -70,6 +78,17 @@ namespace QuanLib.Chemical.AutoGen
         public static Dictionary<string, PubchemPeriodicTableItem> GetPubchemPeriodicTableItems()
         {
             return new PubchemPeriodicTableCsvParser(FileHelper.ReadPubchemPeriodicTableCsv()).GetPeriodicTableItems();
+        }
+
+        public static Dictionary<string, PubchemElementInfo> GetPubchemElementInfos(string[] symbols)
+        {
+            ArgumentNullException.ThrowIfNull(symbols, nameof(symbols));
+
+            Dictionary<string, PubchemElementInfo> result = [];
+            foreach (var item in FileHelper.ReadAllPubchemElementJson(symbols))
+                result.Add(item.Key, new PubchemElementJsonParser(item.Value).GetElement());
+
+            return result;
         }
 
         public static Dictionary<string, BaikePeriodicTableItem> GetBaikePeriodicTableItems()

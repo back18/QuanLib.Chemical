@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -98,6 +100,14 @@ namespace QuanLib.Chemical.AutoGen
             }
 
             return stringBuilder.ToString();
+        }
+
+        public static string BuildIsotopeTableJson(IDictionary<string, ElementContext> elementContexts)
+        {
+            ArgumentNullException.ThrowIfNull(elementContexts, nameof(elementContexts));
+
+            Dictionary<string, ReadOnlyCollection<PubchemIsotope>> table = elementContexts.ToDictionary(i => i.Key, i => i.Value.PubchemElementInfo.Isotopes);
+            return JsonConvert.SerializeObject(table, new JsonSerializerSettings() { Formatting = Formatting.Indented });
         }
 
         private static string FormatElectronConfiguration(string text)

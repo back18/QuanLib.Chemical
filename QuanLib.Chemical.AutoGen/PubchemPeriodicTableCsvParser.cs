@@ -15,14 +15,24 @@ namespace QuanLib.Chemical.AutoGen
         {
             ArgumentException.ThrowIfNullOrEmpty(csv, nameof(csv));
 
-            _csvReader = new(new StringReader(csv), CultureInfo.InvariantCulture);
+            using StringReader stringReader = new StringReader(csv);
+            using CsvReader csvReader = new(stringReader, CultureInfo.InvariantCulture);
+            _items = csvReader.GetRecords<PubchemPeriodicTableItem>().ToDictionary(item => item.Symbol, item => item);
         }
 
-        private readonly CsvReader _csvReader;
+        private readonly Dictionary<string, PubchemPeriodicTableItem> _items;
 
         public Dictionary<string, PubchemPeriodicTableItem> GetPeriodicTableItems()
         {
-            return _csvReader.GetRecords<PubchemPeriodicTableItem>().ToDictionary(item => item.Symbol, item => item);
+            return new Dictionary<string, PubchemPeriodicTableItem>(_items);
+        }
+
+        public Dictionary<string, string> GetElementUrls()
+        {
+            Dictionary<string, string> result = [];
+            foreach (var item in _items.Values)
+                result.Add(item.AtomicNumber, $"https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/element/{item.AtomicNumber}/JSON");
+            return result;
         }
     }
 }
