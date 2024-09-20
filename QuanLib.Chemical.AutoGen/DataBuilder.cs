@@ -10,6 +10,18 @@ namespace QuanLib.Chemical.AutoGen
 {
     public static class DataBuilder
     {
+        private static readonly string[] _droupBlocks = [
+            "AlkaliMetal",
+            "AlkalineEarthMetal",
+            "TransitionMetal",
+            "PostTransitionMetal",
+            "Metalloid",
+            "NonMetal",
+            "Halogen",
+            "NobleGas",
+            "Lanthanide",
+            "Actinide"];
+
         public static string BuildElementSymbolEnum(IDictionary<string, ElementContext> elementContexts)
         {
             ArgumentNullException.ThrowIfNull(elementContexts, nameof(elementContexts));
@@ -90,7 +102,7 @@ namespace QuanLib.Chemical.AutoGen
                 items.Add(pubchemPeriodicTableItem.Electronegativity);
                 items.Add(FormatElectronConfiguration(pubchemPeriodicTableItem.ElectronConfiguration));
                 items.Add($"\"{pubchemPeriodicTableItem.OxidationStates}\"");
-                items.Add(ToGroupBlock(pubchemPeriodicTableItem.GroupBlock).ToString());
+                items.Add(ToGroupBlock(pubchemPeriodicTableItem.GroupBlock));
                 items.Add(pubchemPeriodicTableItem.StandardState.Replace("Expected to be a ", string.Empty));
                 items.Add(string.IsNullOrEmpty(pubchemPeriodicTableItem.CPKHexColor) ? "000000" : pubchemPeriodicTableItem.CPKHexColor);
                 items.Add(pubchemPeriodicTableItem.YearDiscovered == "Ancient" ? "0" : pubchemPeriodicTableItem.YearDiscovered);
@@ -119,16 +131,15 @@ namespace QuanLib.Chemical.AutoGen
             return text;
         }
 
-        private static GroupBlock ToGroupBlock(string text)
+        private static string ToGroupBlock(string text)
         {
-            Dictionary<string, GroupBlock> map = Enum.GetValues<GroupBlock>().ToDictionary(i => i.ToString(), i => i);
             text = text.Replace(" ", string.Empty).Replace("-", string.Empty);
-            string? key = map.Keys.Where(i => text.Equals(i, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+            string? key = _droupBlocks.Where(i => text.Equals(i, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
             if (string.IsNullOrEmpty(key))
                 throw new InvalidOperationException($"无法将“{text}”转换为GroupBlock");
 
-            return map[key];
+            return key;
         }
     }
 }

@@ -1,7 +1,4 @@
-﻿using HtmlAgilityPack;
-using QuanLib.Chemical.Extensions;
-using QuanLib.Core;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,20 +18,6 @@ namespace QuanLib.Chemical.AutoGen
             Release(DataBuilder.BuildIsotopeTableJson(elementContexts), "IsotopeTable.json", FileHelper.OutDirectory, "..\\..\\..\\..\\QuanLib.Chemical\\Data");
 
             Console.ReadLine();
-
-            Element[] elements = PeriodicTable.GetElements();
-            foreach (Element element in elements)
-            {
-                Console.Clear();
-                Console.WriteLine(element.GetPropertiesInfo());
-
-                Console.WriteLine("StableIsotop: " + element.GetStableIsotope());
-                Isotope[] isotopes = PeriodicTable.GetIsotopes(element.Symbol);
-                foreach (Isotope isotope in isotopes)
-                    Console.WriteLine(isotope);
-
-                Console.ReadLine();
-            }
         }
 
         public static void Release(string content, string fileName, string outPath, string targetPath)
