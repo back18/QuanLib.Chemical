@@ -20,9 +20,9 @@ namespace QuanLib.Chemical.AutoGen
 
         private readonly CsvReader _csvReader;
 
-        public Dictionary<string, PubchemElement> GetElements()
+        public Dictionary<string, PubchemPeriodicTableItem> GetElements()
         {
-            return _csvReader.GetRecords<PubchemElement>().ToDictionary(item => item.Symbol, item => item);
+            return _csvReader.GetRecords<PubchemPeriodicTableItem>().ToDictionary(item => item.Symbol, item => item);
         }
     }
 }

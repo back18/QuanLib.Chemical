@@ -22,15 +22,15 @@ namespace QuanLib.Chemical.AutoGen
 
         private readonly HtmlDocument _htmlDocument;
 
-        public Dictionary<string, BaikeElementIntroduction> GetElementIntroductions()
+        public Dictionary<string, BaikePeriodicTableItem> GetPeriodicTableItems()
         {
-            Dictionary<string, BaikeElementIntroduction> result = [];
+            Dictionary<string, BaikePeriodicTableItem> result = [];
             var table1 = ReadTableText(GetIntroductionTableNode1());
             var table2 = ReadTableText(GetIntroductionTableNode2());
 
             foreach (var item in table1)
             {
-                BaikeElementIntroduction elementIntroduction = new()
+                BaikePeriodicTableItem periodicTableItem = new()
                 {
                     AtomicNumber = item.Value["原子序数"],
                     Symbol = item.Value["符号"],
@@ -41,12 +41,12 @@ namespace QuanLib.Chemical.AutoGen
                     Introduction = item.Value["简介"]
                 };
 
-                result.Add(item.Key, elementIntroduction);
+                result.Add(item.Key, periodicTableItem);
             }
 
             foreach (var item in table2)
             {
-                BaikeElementIntroduction elementIntroduction = new()
+                BaikePeriodicTableItem periodicTableItem = new()
                 {
                     AtomicNumber = item.Value["原子序数"],
                     Symbol = item.Value["符号"],
@@ -57,7 +57,7 @@ namespace QuanLib.Chemical.AutoGen
                     Introduction = item.Value["简介"]
                 };
 
-                result.Add(item.Key, elementIntroduction);
+                result.Add(item.Key, periodicTableItem);
             }
 
             return result;

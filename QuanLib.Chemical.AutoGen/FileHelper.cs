@@ -36,20 +36,20 @@ namespace QuanLib.Chemical.AutoGen
             else
                 pubchemPeriodicTableCsv = await ReadPubchemPeriodicTableCsvAsync();
 
-            string periodicTableHtml;
+            string baikePeriodicTableHtml;
             if (!File.Exists(BaikePeriodicTableHtml))
-                periodicTableHtml = await DownloadBaikePeriodicTableHtmlAsync();
+                baikePeriodicTableHtml = await DownloadBaikePeriodicTableHtmlAsync();
             else
-                periodicTableHtml = await ReadBaikePeriodicTableHtmlAsync();
+                baikePeriodicTableHtml = await ReadBaikePeriodicTableHtmlAsync();
 
-            BaikePeriodicTableHtmlParser periodicTableHtmlParser = new(periodicTableHtml);
-            Dictionary<string, BaikeElementIntroduction> elementIntroductionss = periodicTableHtmlParser.GetElementIntroductions();
-            Dictionary<string, string> elementUrls = periodicTableHtmlParser.GetElementUrls();
+            BaikePeriodicTableHtmlParser baikePeriodicTableHtmlParser = new(baikePeriodicTableHtml);
+            Dictionary<string, BaikePeriodicTableItem> baikePeriodicTableItems = baikePeriodicTableHtmlParser.GetPeriodicTableItems();
+            Dictionary<string, string> baikeElementUrls = baikePeriodicTableHtmlParser.GetElementUrls();
 
-            foreach (BaikeElementIntroduction baikeElementIntroduction in elementIntroductionss.Values)
+            foreach (BaikePeriodicTableItem periodicTableItem in baikePeriodicTableItems.Values)
             {
-                string url = elementUrls[baikeElementIntroduction.ChineseName];
-                string path = string.Format(BaikeElementHtmlFormat, baikeElementIntroduction.Symbol);
+                string url = baikeElementUrls[periodicTableItem.ChineseName];
+                string path = string.Format(BaikeElementHtmlFormat, periodicTableItem.Symbol);
 
                 if (!File.Exists(path))
                 {
@@ -101,11 +101,11 @@ namespace QuanLib.Chemical.AutoGen
                 periodicTableHtml = await ReadBaikePeriodicTableHtmlAsync();
 
             BaikePeriodicTableHtmlParser periodicTableHtmlParser = new(periodicTableHtml);
-            Dictionary<string, BaikeElementIntroduction> elementIntroductionss = periodicTableHtmlParser.GetElementIntroductions();
+            Dictionary<string, BaikePeriodicTableItem> periodicTableItems = periodicTableHtmlParser.GetPeriodicTableItems();
             Dictionary<string, string> elementUrls = periodicTableHtmlParser.GetElementUrls();
 
-            BaikeElementIntroduction baikeElementIntroduction = elementIntroductionss[symbol];
-            return await DownloadTextAsync(elementUrls[baikeElementIntroduction.ChineseName], string.Format(BaikeElementHtmlFormat, baikeElementIntroduction.Symbol));
+            BaikePeriodicTableItem periodicTableItem = periodicTableItems[symbol];
+            return await DownloadTextAsync(elementUrls[periodicTableItem.ChineseName], string.Format(BaikeElementHtmlFormat, periodicTableItem.Symbol));
         }
 
         public static async Task<string> DownloadTextAsync(string url, string path)

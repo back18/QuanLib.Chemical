@@ -21,7 +21,7 @@ namespace QuanLib.Chemical.AutoGen
 
         private readonly HtmlDocument _htmlDocument;
 
-        public BaikeElement GetElement()
+        public BaikeElementInfo GetElement()
         {
             return new()
             {

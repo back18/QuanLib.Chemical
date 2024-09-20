@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace QuanLib.Chemical.AutoGen
 {
-    public class PubchemElement
+    public class PubchemPeriodicTableItem
     {
         public required string AtomicNumber { get; set; }
 

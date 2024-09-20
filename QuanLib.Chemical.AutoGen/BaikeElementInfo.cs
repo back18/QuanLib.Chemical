@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace QuanLib.Chemical.AutoGen
 {
-    public class BaikeElement
+    public class BaikeElementInfo
     {
         public required string Name { get; set; }
 

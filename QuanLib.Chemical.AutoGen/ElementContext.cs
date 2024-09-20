@@ -8,21 +8,21 @@ namespace QuanLib.Chemical.AutoGen
 {
     public class ElementContext
     {
-        public ElementContext(PubchemElement pubchemElement, BaikeElementIntroduction baikeElementIntroduction, BaikeElement baikeElement)
+        public ElementContext(PubchemPeriodicTableItem pubchemPeriodicTableItem, BaikePeriodicTableItem baikePeriodicTableItem, BaikeElementInfo baikeElementInfo)
         {
-            ArgumentNullException.ThrowIfNull(pubchemElement, nameof(pubchemElement));
-            ArgumentNullException.ThrowIfNull(baikeElementIntroduction, nameof(baikeElementIntroduction));
-            ArgumentNullException.ThrowIfNull(baikeElement, nameof(baikeElement));
+            ArgumentNullException.ThrowIfNull(pubchemPeriodicTableItem, nameof(pubchemPeriodicTableItem));
+            ArgumentNullException.ThrowIfNull(baikePeriodicTableItem, nameof(baikePeriodicTableItem));
+            ArgumentNullException.ThrowIfNull(baikeElementInfo, nameof(baikeElementInfo));
 
-            PubchemElement = pubchemElement;
-            BaikeElementIntroduction = baikeElementIntroduction;
-            BaikeElement = baikeElement;
+            PubchemPeriodicTableItem = pubchemPeriodicTableItem;
+            BaikePeriodicTableItem = baikePeriodicTableItem;
+            BaikeElementInfo = baikeElementInfo;
         }
 
-        public PubchemElement PubchemElement { get; }
+        public PubchemPeriodicTableItem PubchemPeriodicTableItem { get; }
 
-        public BaikeElementIntroduction BaikeElementIntroduction { get; }
+        public BaikePeriodicTableItem BaikePeriodicTableItem { get; }
 
-        public BaikeElement BaikeElement { get; }
+        public BaikeElementInfo BaikeElementInfo { get; }
     }
 }

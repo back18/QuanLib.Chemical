@@ -57,31 +57,31 @@ namespace QuanLib.Chemical.AutoGen
         public static Dictionary<string, ElementContext> GetElementContexts()
         {
             Dictionary<string, ElementContext> result = [];
-            Dictionary<string, PubchemElement> pubchemElements = GetPubchemElements();
-            Dictionary<string, BaikeElementIntroduction> baikeElementIntroductions = GetBaikeElementIntroductions();
-            Dictionary<string, BaikeElement> baikeElements = GetBaikeElements(pubchemElements.Keys.ToArray());
+            Dictionary<string, PubchemPeriodicTableItem> pubchemPeriodicTableItems = GetPubchemPeriodicTableItems();
+            Dictionary<string, BaikePeriodicTableItem> baikePeriodicTableItems = GetBaikePeriodicTableItems();
+            Dictionary<string, BaikeElementInfo> baikeElementInfos = GetBaikeElementInfos(pubchemPeriodicTableItems.Keys.ToArray());
 
-            foreach (string symbols in pubchemElements.Keys)
-                result.Add(symbols, new(pubchemElements[symbols], baikeElementIntroductions[symbols], baikeElements[symbols]));
+            foreach (string symbols in pubchemPeriodicTableItems.Keys)
+                result.Add(symbols, new(pubchemPeriodicTableItems[symbols], baikePeriodicTableItems[symbols], baikeElementInfos[symbols]));
 
             return result;
         }
 
-        public static Dictionary<string, PubchemElement> GetPubchemElements()
+        public static Dictionary<string, PubchemPeriodicTableItem> GetPubchemPeriodicTableItems()
         {
             return new PubchemPeriodicTableCsvParser(FileHelper.ReadPubchemPeriodicTableCsv()).GetElements();
         }
 
-        public static Dictionary<string, BaikeElementIntroduction> GetBaikeElementIntroductions()
+        public static Dictionary<string, BaikePeriodicTableItem> GetBaikePeriodicTableItems()
         {
-            return new BaikePeriodicTableHtmlParser(FileHelper.ReadBaikePeriodicTableHtml()).GetElementIntroductions();
+            return new BaikePeriodicTableHtmlParser(FileHelper.ReadBaikePeriodicTableHtml()).GetPeriodicTableItems();
         }
 
-        public static Dictionary<string, BaikeElement> GetBaikeElements(string[] symbols)
+        public static Dictionary<string, BaikeElementInfo> GetBaikeElementInfos(string[] symbols)
         {
             ArgumentNullException.ThrowIfNull(symbols, nameof(symbols));
 
-            Dictionary<string, BaikeElement> result = [];
+            Dictionary<string, BaikeElementInfo> result = [];
             foreach (var item in FileHelper.ReadAllBaikeElementHtml(symbols))
                 result.Add(item.Key, new BaikeElementHtmlParser(item.Value).GetElement());
 

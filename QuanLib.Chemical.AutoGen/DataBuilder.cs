@@ -28,10 +28,10 @@ namespace QuanLib.Chemical.AutoGen
             foreach (ElementContext elementContext in elementContexts.Values)
             {
                 stringBuilder.AppendLine("        /// <summary>");
-                stringBuilder.AppendFormat("        /// {0} ({1})", elementContext.BaikeElementIntroduction.ChineseName, elementContext.PubchemElement.Name);
+                stringBuilder.AppendFormat("        /// {0} ({1})", elementContext.BaikePeriodicTableItem.ChineseName, elementContext.PubchemPeriodicTableItem.Name);
                 stringBuilder.AppendLine();
                 stringBuilder.AppendLine("        /// </summary>");
-                stringBuilder.AppendFormat("        {0} = {1},", elementContext.PubchemElement.Symbol, elementContext.PubchemElement.AtomicNumber);
+                stringBuilder.AppendFormat("        {0} = {1},", elementContext.PubchemPeriodicTableItem.Symbol, elementContext.PubchemPeriodicTableItem.AtomicNumber);
                 stringBuilder.AppendLine();
                 stringBuilder.AppendLine();
             }
@@ -71,27 +71,27 @@ namespace QuanLib.Chemical.AutoGen
 
             foreach (ElementContext elementContext in elementContexts.Values)
             {
-                PubchemElement pubchemElement = elementContext.PubchemElement;
+                PubchemPeriodicTableItem pubchemPeriodicTableItem = elementContext.PubchemPeriodicTableItem;
                 List<string> items = [];
 
-                items.Add(pubchemElement.Symbol);
-                items.Add(pubchemElement.Name);
-                items.Add(elementContext.BaikeElementIntroduction.ChineseName);
-                items.Add(elementContext.BaikeElementIntroduction.PinYin);
-                items.Add(pubchemElement.AtomicMass);
-                items.Add(pubchemElement.AtomicRadius);
-                items.Add(pubchemElement.Density);
-                items.Add(pubchemElement.MeltingPoint);
-                items.Add(pubchemElement.BoilingPoint);
-                items.Add(pubchemElement.IonizationEnergy);
-                items.Add(pubchemElement.ElectronAffinity);
-                items.Add(pubchemElement.Electronegativity);
-                items.Add(FormatElectronConfiguration(pubchemElement.ElectronConfiguration));
-                items.Add($"\"{pubchemElement.OxidationStates}\"");
-                items.Add(ToGroupBlock(pubchemElement.GroupBlock).ToString());
-                items.Add(pubchemElement.StandardState.Replace("Expected to be a ", string.Empty));
-                items.Add(string.IsNullOrEmpty(pubchemElement.CPKHexColor) ? "000000" : pubchemElement.CPKHexColor);
-                items.Add(pubchemElement.YearDiscovered == "Ancient" ? "0" : pubchemElement.YearDiscovered);
+                items.Add(pubchemPeriodicTableItem.Symbol);
+                items.Add(pubchemPeriodicTableItem.Name);
+                items.Add(elementContext.BaikePeriodicTableItem.ChineseName);
+                items.Add(elementContext.BaikePeriodicTableItem.PinYin);
+                items.Add(pubchemPeriodicTableItem.AtomicMass);
+                items.Add(pubchemPeriodicTableItem.AtomicRadius);
+                items.Add(pubchemPeriodicTableItem.Density);
+                items.Add(pubchemPeriodicTableItem.MeltingPoint);
+                items.Add(pubchemPeriodicTableItem.BoilingPoint);
+                items.Add(pubchemPeriodicTableItem.IonizationEnergy);
+                items.Add(pubchemPeriodicTableItem.ElectronAffinity);
+                items.Add(pubchemPeriodicTableItem.Electronegativity);
+                items.Add(FormatElectronConfiguration(pubchemPeriodicTableItem.ElectronConfiguration));
+                items.Add($"\"{pubchemPeriodicTableItem.OxidationStates}\"");
+                items.Add(ToGroupBlock(pubchemPeriodicTableItem.GroupBlock).ToString());
+                items.Add(pubchemPeriodicTableItem.StandardState.Replace("Expected to be a ", string.Empty));
+                items.Add(string.IsNullOrEmpty(pubchemPeriodicTableItem.CPKHexColor) ? "000000" : pubchemPeriodicTableItem.CPKHexColor);
+                items.Add(pubchemPeriodicTableItem.YearDiscovered == "Ancient" ? "0" : pubchemPeriodicTableItem.YearDiscovered);
 
                 stringBuilder.AppendJoin(',', items);
                 stringBuilder.AppendLine();

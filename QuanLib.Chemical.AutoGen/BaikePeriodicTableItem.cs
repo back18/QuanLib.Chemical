@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace QuanLib.Chemical.AutoGen
 {
-    public class BaikeElementIntroduction
+    public class BaikePeriodicTableItem
     {
         public required string AtomicNumber { get; set; }
 
