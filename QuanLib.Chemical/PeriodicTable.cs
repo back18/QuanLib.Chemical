@@ -53,6 +53,8 @@ namespace QuanLib.Chemical
 
         public static Element GetElement(ElementSymbol symbol) => _elements[symbol];
 
+        public static ElementAddon GetElementAddon(ElementSymbol symbol) => new(_elements[symbol]);
+
         public static Isotope[] GetIsotopes(ElementSymbol symbol)
         {
             Isotope[] isotopes = _isotopes[symbol];

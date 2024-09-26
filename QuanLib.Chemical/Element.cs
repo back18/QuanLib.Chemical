@@ -20,10 +20,10 @@ namespace QuanLib.Chemical
         static Element()
         {
             Type type = typeof(Element);
-            _properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+            _properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public).ToDictionary(i => i.Name, i => i);
             _units = [];
 
-            foreach (PropertyInfo property in _properties)
+            foreach (PropertyInfo property in _properties.Values)
             {
                 UnitAttribute? unitAttribute = property.GetCustomAttribute<UnitAttribute>();
                 if (unitAttribute is not null)
@@ -31,9 +31,11 @@ namespace QuanLib.Chemical
             }
         }
 
-        private readonly static PropertyInfo[] _properties;
+        private readonly static Dictionary<string, PropertyInfo> _properties;
 
         private readonly static Dictionary<string, string> _units;
+
+        private readonly Dictionary<string, object?> _values = [];
 
         /// <summary>
         /// 元素符号
@@ -59,11 +61,6 @@ namespace QuanLib.Chemical
         /// 汉语拼音
         /// </summary>
         public required string PinYin { get; init; }
-
-        /// <summary>
-        /// 质子数量
-        /// </summary>
-        public int ProtonCount => AtomicNumber;
 
         /// <summary>
         /// 相对原子质量
@@ -154,31 +151,50 @@ namespace QuanLib.Chemical
 
         public string GetPropertiesInfo()
         {
-            int length = _properties.Max(i => i.Name.Length) + 2;
+            int length = _properties.Keys.Max(i => i.Length) + 2;
             StringBuilder stringBuilder = new();
 
-            foreach (PropertyInfo property in _properties)
+            foreach (string propertyName in _properties.Keys)
             {
-                stringBuilder.Append(property.Name);
-                stringBuilder.Append(new string('-', length - property.Name.Length));
-
-                object? value = property.GetValue(this, null);
-                stringBuilder.Append(ObjectFormatter.Format(value));
-
-                if (value is not null && _units.TryGetValue(property.Name, out var unit))
-                    stringBuilder.Append(unit);
-
-                stringBuilder.AppendLine();
+                stringBuilder.Append(propertyName);
+                stringBuilder.Append(new string('-', length - propertyName.Length));
+                stringBuilder.AppendLine(GetPropertyText(propertyName));
             }
 
             return stringBuilder.ToString();
         }
 
-        public static string? GetPropertyUnit(string property)
+        public string? GetPropertyText(string propertyName)
         {
-            ArgumentException.ThrowIfNullOrEmpty(property, nameof(property));
+            object? value = GetPropertyValue(propertyName);
+            if (value is null)
+                return null;
 
-            _units.TryGetValue(property, out var unit);
+            string text = value is string str ? str : ObjectFormatter.Format(value);
+            if (_units.TryGetValue(propertyName, out var unit))
+                text = $"{text} {unit}";
+
+            return text;
+        }
+
+        public object? GetPropertyValue(string propertyName)
+        {
+            if (_values.TryGetValue(propertyName, out var value))
+                return value;
+
+            if (!_properties.TryGetValue(propertyName, out var property))
+                return null;
+
+            value = property.GetValue(this, null);
+            _values.TryAdd(propertyName, value);
+            return value;
+        }
+
+        public static string? GetPropertyUnit(string propertyName)
+        {
+            ArgumentException.ThrowIfNullOrEmpty(propertyName, nameof(propertyName));
+
+            _units.TryGetValue(propertyName, out var unit);
             return unit;
         }
 
