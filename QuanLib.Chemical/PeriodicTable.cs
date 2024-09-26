@@ -62,7 +62,7 @@ namespace QuanLib.Chemical
                 return [new()
                 {
                     Symbol = element.Symbol.ToString(),
-                    Number = (int)Math.Round(element.AtomicMass),
+                    MassNumber = (int)Math.Round(element.AtomicMass),
                     AtomicMass = element.AtomicMass,
                     Abundance = 0
                 }];

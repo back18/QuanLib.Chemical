@@ -10,7 +10,7 @@ namespace QuanLib.Chemical.AutoGen
     {
         public required string Symbol { get; set; }
 
-        public required int Number { get; set; }
+        public required int MassNumber { get; set; }
 
         public required double AtomicMass { get; set; }
 
@@ -21,7 +21,7 @@ namespace QuanLib.Chemical.AutoGen
             if (other is null)
                 return 1;
 
-            return Number.CompareTo(other.Number);
+            return MassNumber.CompareTo(other.MassNumber);
         }
     }
 }

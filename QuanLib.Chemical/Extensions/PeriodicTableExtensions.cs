@@ -57,14 +57,24 @@ namespace QuanLib.Chemical.Extensions
             return result.OrderBy(i => i.Key).Select(i => i.Value).ToArray();
         }
 
+        public static int GetShellCount(this Element element)
+        {
+            return GetElectronsPerShell(element).Length;
+        }
+
         public static int GetElectronCount(this Element element)
         {
             return GetElectronsPerShell(element).Sum();
         }
 
-        public static int GetElectronShellCount(this Element element)
+        public static int GetProtonCount(this Element element)
         {
-            return GetElectronsPerShell(element).Length;
+            return element.AtomicNumber;
+        }
+
+        public static int GetNeutronCount(this Element element)
+        {
+            return GetStableIsotope(element).MassNumber - element.AtomicNumber;
         }
 
         public static Isotope GetStableIsotope(this Element element)
@@ -88,11 +98,6 @@ namespace QuanLib.Chemical.Extensions
             }
 
             return values.MinBy(i => i.offset).isotope;
-        }
-
-        public static int GetNeutronCount(this Element element)
-        {
-            return GetStableIsotope(element).Number - element.ProtonCount;
         }
     }
 }

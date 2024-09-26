@@ -10,7 +10,7 @@ namespace QuanLib.Chemical
     {
         public required string Symbol { get; init; }
 
-        public required int Number { get; init; }
+        public required int MassNumber { get; init; }
 
         public required double AtomicMass { get; init; }
 
@@ -18,7 +18,7 @@ namespace QuanLib.Chemical
 
         public override string ToString()
         {
-            return $"{Symbol}{Number} ({Math.Round(Abundance * 100, 2)}%)";
+            return $"{MassNumber}{Symbol} ({Math.Round(Abundance * 100, 2)}%)";
         }
     }
 }

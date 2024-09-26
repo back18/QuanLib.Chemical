@@ -176,7 +176,7 @@ namespace QuanLib.Chemical.AutoGen
                 PubchemIsotope pubchemIsotope = new()
                 {
                     Symbol = symbol,
-                    Number = number,
+                    MassNumber = number,
                     AtomicMass = atomicMass,
                     Abundance = abundance
                 };
